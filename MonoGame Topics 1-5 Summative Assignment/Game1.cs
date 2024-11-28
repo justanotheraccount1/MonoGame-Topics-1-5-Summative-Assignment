@@ -16,10 +16,10 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Random generator = new Random(3);
         int malletXSpeed, malletYSpeed;
+        int score = 0;
         Texture2D moleDown, molePeak, moleUp, moleStars, introTexture, backgroundTexture, endTexture, malletTexture;
-        Rectangle moleRect1, moleRect2, moleRect3, window, malletRect,quitRect;
+        Rectangle moleRect1, moleRect2, moleRect3, window, malletRect;
         SoundEffect backgroundSound, tadaaSound, bonkSound;
         SoundEffectInstance backgroundSoundInstance;
         bool part1 = false;
@@ -31,7 +31,7 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
 
         Screen screen;
         SpriteFont textFont;
-        Vector2 text;
+        Vector2 text, scoreText;
         MouseState mouseState;
         public Game1()
         {
@@ -48,7 +48,6 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
             moleRect2 = new Rectangle(300, 250, 200, 250);
             moleRect3 = new Rectangle(550, 250, 200, 250);
             malletRect = new Rectangle(600, 350, 200, 150);
-            quitRect = new Rectangle(600, 400, 200, 100);
             _graphics.PreferredBackBufferWidth = 800;
             _graphics.PreferredBackBufferHeight = 500;
             _graphics.ApplyChanges();
@@ -57,6 +56,7 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
             malletYSpeed = 0;
 
             text = new Vector2(500, 10);
+            scoreText = new Vector2(10, 10);
             base.Initialize();
             backgroundSoundInstance.IsLooped = true;
             
@@ -77,6 +77,7 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
             tadaaSound = Content.Load<SoundEffect>("tadaaSound");
             textFont = Content.Load<SpriteFont>("spriteFont");
             malletTexture = Content.Load<Texture2D>("mallet");
+            endTexture = Content.Load<Texture2D>("moleEndBG");
             // TODO: use this.Content to load your game content here
         }
 
@@ -106,8 +107,8 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
                 malletRect.Y += malletYSpeed;
                 if (part1)
                 {
-                    malletXSpeed = -2;
-                    malletYSpeed = -1;
+                    malletXSpeed = -4;
+                    malletYSpeed = -2;
                     if (malletRect.X <= 100)
                     {
                         moleOut = true;
@@ -119,7 +120,7 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
                             malletYSpeed = 0;
                             moleBonk = true;
                             moleOut = false;
-
+                            score += 1;
                         }
                         if (moleBonk)
                         {
@@ -130,31 +131,98 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
                             
                         }
                     }
-                    if (part2)
+                }
+                if (part2)
+                {
+                    if (!moleOut && !moleBonk)
                     {
-                        malletYSpeed = -1;
+                        malletYSpeed = -4;
                         if (malletRect.Y <= 0)
                         {
+                            malletYSpeed = 0;
                             malletRect.Y = 0;
                             moleOut = true;
-                            malletYSpeed = 0;
-                            malletXSpeed = 2;
-
                         }
 
                     }
+                    if (moleOut)
+                    {
+                        malletXSpeed = 3;
+                        if (malletRect.X >= 350)
+                        {
+                            malletXSpeed = 0;
+                            malletYSpeed = 4;
+                            if ((malletRect.Bottom - 50) >= moleRect2.Y)
+                            {
+                                malletYSpeed = 0;
+                                moleBonk = true;
+                                moleOut = false;
+                                score += 1;
+                            }
+                        }
+                    }
+                    if (moleBonk)
+                    {
+                        bonkSound.Play();
+                        moleBonk = false;
+                        part3 = true;
+                        part2 = false;
+                    }
                 }
-
-
-                if (end && mouseState.LeftButton == ButtonState.Pressed)
+                if (part3)
                 {
-                    if (quitRect.Contains(mouseState.Position))
-                        screen = Screen.End;
+                    if (!moleOut && !moleBonk && !end)
+                    {
+                        malletYSpeed = -4;
+                        malletXSpeed = 2;
+                        if (malletRect.Y <= 0)
+                        {
+                            malletYSpeed = 0;
+                            moleOut = true;
+                        }
+                    }
+                    if (moleOut)
+                    {
+                        if (malletRect.X >= 600)
+                        {
+                            malletRect.X = 599;
+                            malletXSpeed = 0;
+                            malletYSpeed = 4;
+                        }
+                        if ((malletRect.Bottom - 50) >= moleRect3.Y)
+                        {
+                            malletYSpeed = 0;
+                            moleBonk = true;
+                            moleOut = false;
+                            score += 1;
+                        }
+                        
+                    }
+                    if (moleBonk)
+                    {
+                        bonkSound.Play();
+                        moleBonk = false;
+                        end = true;
+
+                    }
+                    if (end)
+                    {
+
+                        if (mouseState.LeftButton == ButtonState.Pressed)
+                        { 
+                            screen = Screen.End;
+                            tadaaSound.Play();
+                        }
+                    }
                 }
+
+                
+
+
             }
             if (screen == Screen.End)
             {
-
+                backgroundSoundInstance.Stop();
             }
             base.Update(gameTime);
         }
@@ -171,7 +239,7 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
             if (screen == Screen.Main)
             {
                 _spriteBatch.Draw(backgroundTexture, window, Color.White);
-                
+                _spriteBatch.DrawString(textFont, "Score:" + score, scoreText, Color.Black);
                 if (part1)
                 {
                     _spriteBatch.Draw(moleDown, moleRect2, Color.White);
@@ -199,11 +267,29 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
                     if (moleBonk)
                         _spriteBatch.Draw(moleStars,moleRect2, Color.White);
                 }
+                if (part3)
+                {
+                    _spriteBatch.Draw(moleStars, moleRect1, Color.White);
+                    _spriteBatch.Draw(moleStars, moleRect2, Color.White);
+                    if (!moleOut && !moleBonk && !end)
+                    {
+                        _spriteBatch.Draw(molePeak, moleRect3, Color.White);
+                    }
+                    if (moleOut)
+                        _spriteBatch.Draw(moleUp, moleRect3, Color.White);
+                    if (moleBonk || end)
+                        _spriteBatch.Draw(moleStars, moleRect3, Color.White);
+                    if (end)
+                    {
+                        _spriteBatch.DrawString(textFont, "Click anywhere to quit...", text, Color.Black);
+                    }
+                }
                 _spriteBatch.Draw(malletTexture, malletRect, Color.White);
+
             }
             if (screen == Screen.End)
             {
-
+                _spriteBatch.Draw(endTexture, window, Color.White);
             }
             // TODO: Add your drawing code here
             _spriteBatch.End();
