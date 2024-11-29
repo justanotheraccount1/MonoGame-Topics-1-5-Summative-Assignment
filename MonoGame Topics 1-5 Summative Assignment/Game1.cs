@@ -16,7 +16,7 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        int malletXSpeed, malletYSpeed;
+        Vector2 malletSpeed;
         int score = 0;
         Texture2D moleDown, molePeak, moleUp, moleStars, introTexture, backgroundTexture, endTexture, malletTexture;
         Rectangle moleRect1, moleRect2, moleRect3, window, malletRect;
@@ -52,8 +52,8 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
             _graphics.PreferredBackBufferHeight = 500;
             _graphics.ApplyChanges();
             window = new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
-            malletXSpeed = 0;
-            malletYSpeed = 0;
+            malletSpeed = new Vector2(); 
+            
 
             text = new Vector2(500, 10);
             scoreText = new Vector2(370, 200);
@@ -103,21 +103,21 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
             }
             if (screen == Screen.Main)
             {
-                malletRect.X += malletXSpeed;
-                malletRect.Y += malletYSpeed;
+                malletRect.X += (int)malletSpeed.X;
+                malletRect.Y += (int)malletSpeed.Y;
                 if (part1)
                 {
-                    malletXSpeed = -4;
-                    malletYSpeed = -2;
+                    malletSpeed.X = -4;
+                    malletSpeed.Y = -2;
                     if (malletRect.X <= 100)
                     {
                         moleOut = true;
                         malletRect.X = 100;
-                        malletXSpeed = 0;
-                        malletYSpeed = 2;
+                        malletSpeed.X = 0;
+                        malletSpeed.Y = 2;
                         if (malletRect.Y >= 150)
                         {
-                            malletYSpeed = 0;
+                            malletSpeed.Y = 0;
                             moleBonk = true;
                             moleOut = false;
                             score += 1;
@@ -136,10 +136,10 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
                 {
                     if (!moleOut && !moleBonk)
                     {
-                        malletYSpeed = -4;
+                        malletSpeed.Y = -4;
                         if (malletRect.Y <= 0)
                         {
-                            malletYSpeed = 0;
+                            malletSpeed.Y = 0;
                             malletRect.Y = 0;
                             moleOut = true;
                         }
@@ -147,14 +147,14 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
                     }
                     if (moleOut)
                     {
-                        malletXSpeed = 3;
+                        malletSpeed.X = 3;
                         if (malletRect.X >= 350)
                         {
-                            malletXSpeed = 0;
-                            malletYSpeed = 4;
+                            malletSpeed.X = 0;
+                            malletSpeed.Y = 4;
                             if ((malletRect.Bottom - 50) >= moleRect2.Y)
                             {
-                                malletYSpeed = 0;
+                                malletSpeed.Y = 0;
                                 moleBonk = true;
                                 moleOut = false;
                                 score += 1;
@@ -173,11 +173,11 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
                 {
                     if (!moleOut && !moleBonk && !end)
                     {
-                        malletYSpeed = -4;
-                        malletXSpeed = 2;
+                        malletSpeed.Y = -4;
+                        malletSpeed.X = 2;
                         if (malletRect.Y <= 0)
                         {
-                            malletYSpeed = 0;
+                            malletSpeed.Y = 0;
                             moleOut = true;
                         }
                     }
@@ -186,12 +186,12 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
                         if (malletRect.X >= 600)
                         {
                             malletRect.X = 599;
-                            malletXSpeed = 0;
-                            malletYSpeed = 4;
+                            malletSpeed.X = 0;
+                            malletSpeed.Y = 4;
                         }
                         if ((malletRect.Bottom - 50) >= moleRect3.Y)
                         {
-                            malletYSpeed = 0;
+                            malletSpeed.Y = 0;
                             moleBonk = true;
                             moleOut = false;
                             score += 1;
