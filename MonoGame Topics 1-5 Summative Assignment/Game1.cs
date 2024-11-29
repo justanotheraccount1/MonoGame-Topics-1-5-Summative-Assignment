@@ -56,7 +56,7 @@ namespace MonoGame_Topics_1_5_Summative_Assignment
             malletYSpeed = 0;
 
             text = new Vector2(500, 10);
-            scoreText = new Vector2(10, 10);
+            scoreText = new Vector2(370, 200);
             base.Initialize();
             backgroundSoundInstance.IsLooped = true;
             
